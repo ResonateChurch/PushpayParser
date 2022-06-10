@@ -9,7 +9,7 @@ namespace StaffIncomeCSVParser
         public decimal Amount { get; set; }
         public string? FundName { get; set; }
         public string? FundCode { get; set; }
-        public bool ActiveStatus { get; set; }
+        public Status ActiveStatus { get; set; }
     }
 
     public sealed class PushpayRecurringCSVMap : ClassMap<PushpayRecurringCSVRow>
@@ -19,7 +19,7 @@ namespace StaffIncomeCSVParser
             Map(m => m.Amount).Name("Amount", "amount");
             Map(m => m.FundName).Name("FundName", "Fund Name");
             Map(m => m.FundCode).Name("FundCode", "Fund Code");
-            Map(m => m.ActiveStatus).Name("Status", "status").TypeConverter<StatusConverter<bool>>();
+            Map(m => m.ActiveStatus).Name("Status", "status").TypeConverter<StatusConverter<Status>>();
         }
     }
 
@@ -29,11 +29,19 @@ namespace StaffIncomeCSVParser
         {
             if (text.ToLower().Contains("active"))
             {
-                return true;
+                return Status.Active;
+            }
+            else if (text.ToLower().Contains("paused"))
+            {
+                return Status.Paused;
+            }
+            else if (text.ToLower().Contains("cancelled"))
+            {
+                return Status.Cancelled;
             }
             else
             {
-                return false;
+                return Status.Unknown;
             }
         }
 
@@ -41,10 +49,20 @@ namespace StaffIncomeCSVParser
         {
             return value switch
             {
-                true => "Active",
-                false => "Cancelled",
-                _ => "Status Unknown",
+                Status.Active => Status.Active.ToString(),
+                Status.Paused => Status.Paused.ToString(),
+                Status.Cancelled => Status.Cancelled.ToString(),
+                Status.Unknown => Status.Unknown.ToString(),
+                _ => Status.Unknown.ToString(),
             };
         }
+    }
+
+    public enum Status
+    {
+        Active = 1,
+        Paused = 2,
+        Cancelled = 3,
+        Unknown = 4
     }
 }

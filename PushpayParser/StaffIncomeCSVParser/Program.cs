@@ -28,7 +28,7 @@ namespace StaffIncomeCSVParser
             }
             records.ForEach(i =>
             {
-                if (i.ActiveStatus)
+                if (i.ActiveStatus is Status.Active)
                 {
                     if (int.TryParse(i.FundCode, out _))
                     {
@@ -51,7 +51,7 @@ namespace StaffIncomeCSVParser
             Dictionary<int, string> idNamePair = new();
             records.ForEach(i =>
             {
-                if (i.ActiveStatus)
+                if (i.ActiveStatus is Status.Active)
                 {
                     if (!string.IsNullOrEmpty(i.FundName))
                     {
