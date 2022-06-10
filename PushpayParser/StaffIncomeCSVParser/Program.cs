@@ -26,6 +26,7 @@ namespace StaffIncomeCSVParser
                 IEnumerable<PushpayRecurringCSVRow> csvRecords = csv.GetRecords<PushpayRecurringCSVRow>();
                 records = csvRecords.ToList();
             }
+            // Add up all amounts and associate with a FundCode
             records.ForEach(i =>
             {
                 if (i.ActiveStatus is Status.Active)
@@ -48,6 +49,7 @@ namespace StaffIncomeCSVParser
                     }
                 }
             });
+            // Parse Names from FundName and Associate with FundCode
             Dictionary<int, string> idNamePair = new();
             records.ForEach(i =>
             {
@@ -62,7 +64,7 @@ namespace StaffIncomeCSVParser
                             {
                                 if (!idNamePair.ContainsKey(fundCodeFromNameInt))
                                 {
-                                    string fundName = i.FundName.Replace(fundCodeFromName, string.Empty);
+                                    string fundName = i.FundName.Replace(fundCodeFromName, string.Empty).Trim();
                                     idNamePair.Add(fundCodeFromNameInt, fundName);
                                 }
                             }
