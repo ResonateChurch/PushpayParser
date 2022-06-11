@@ -40,11 +40,11 @@ namespace StaffIncomeCSVParser
                             {
                                 throw new InvalidOperationException($"Fund {fundCode} cannot be found in dictionary");
                             }
-                            totalAmounts[fundCode] = amount + i.Amount;
+                            totalAmounts[fundCode] = amount + (i.Amount * i.GivingFrequency.NumberOfOccurancesAMonth());
                         }
                         else
                         {
-                            totalAmounts.Add(int.Parse(i.FundCode), i.Amount);
+                            totalAmounts.Add(int.Parse(i.FundCode), (i.Amount * i.GivingFrequency.NumberOfOccurancesAMonth()));
                         }
                     }
                 }
@@ -76,11 +76,13 @@ namespace StaffIncomeCSVParser
             List<ResultingCSVRow> results = new();
             foreach (KeyValuePair<int, decimal> item in totalAmounts)
             {
-                results.Add(new ResultingCSVRow { FundCode = item.Key.ToString(), Name = idNamePair[item.Key], TotalMonthlyRecurringGifts = item.Value });
+                results.Add(new ResultingCSVRow { FundCode = item.Key, Name = idNamePair[item.Key], TotalMonthlyRecurringGifts = item.Value });
             }
+            results.Sort(comparison: (a, b) => a.FundCode.CompareTo(b.FundCode));
             using (var writer = new StreamWriter(outputPath))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
+                csv.Context.RegisterClassMap<ResultingCSVRowCSVMap>();
                 csv.WriteRecords(results);
             }
             Console.WriteLine($"Parsed CSV has been saved to {outputPath}");
